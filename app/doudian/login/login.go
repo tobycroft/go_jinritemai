@@ -13,11 +13,12 @@ func Doudian_Login() (err error) {
 	doudian.PlayWrightMain.Page, err = doudian.PlayWrightMain.Context.NewPage()
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)
-		return err
+		return
 	}
 	_, err = doudian.PlayWrightMain.Page.Goto("https://fxg.jinritemai.com/login/common")
 	if err != nil {
 		log.Fatalf("could not goto: %v", err)
+		return
 	} else {
 		//fmt.Println(resp.StatusText())
 		//log.Println(rpp.Text())
@@ -44,22 +45,27 @@ func Doudian_Login() (err error) {
 		err = doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click()
 		if err != nil {
 			log.Fatalf("could not click: %v", err)
+			return
 		}
 		err = doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type(value["mail"])
 		if err != nil {
 			log.Fatalf("could not Type: %v", err)
+			return
 		}
 		err = doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type(value["password"])
 		if err != nil {
 			log.Fatalf("could not Type: %v", err)
+			return
 		}
 		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check()
 		if err != nil {
 			log.Fatalf("could not Check: %v", err)
+			return
 		}
 		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click()
 		if err != nil {
 			log.Fatalf("could not click: %v", err)
+			return
 		}
 	}
 
@@ -67,5 +73,5 @@ func Doudian_Login() (err error) {
 	//fmt.Println(doudian.PlayWrightMain.Page.Click())
 
 	time.Sleep(10 * time.Second)
-	return nil
+	return
 }
