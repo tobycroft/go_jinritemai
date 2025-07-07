@@ -2,6 +2,7 @@ package login
 
 import (
 	"fmt"
+	"github.com/Unknwon/goconfig"
 	"github.com/playwright-community/playwright-go"
 	"log"
 	"main.go/app/doudian"
@@ -29,15 +30,43 @@ func Doudian_Login() (err error) {
 	//	log.Println(rpp.Text())
 	//
 	//})
-	fmt.Println(doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click())
-	fmt.Println(doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type("asdasd@123.com"))
-	fmt.Println(doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type("asdasd"))
-	fmt.Println(doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check())
-	fmt.Println(doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click())
+	cfg, err := goconfig.LoadConfigFile("conf.ini")
+	if err != nil {
+		goconfig.SaveConfigFile(&goconfig.ConfigFile{}, "conf.ini")
+	} else {
+		value, err := cfg.GetSection("jinritemai")
+		if err != nil {
+			cfg.SetValue("jinritemai", "mail", "youxiang")
+			cfg.SetValue("jinritemai", "password", "mima")
+			goconfig.SaveConfigFile(cfg, "conf.ini")
+			fmt.Println("jinritemai_ready")
+		}
+		err = doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click()
+		if err != nil {
+			log.Fatalf("could not click: %v", err)
+		}
+		err = doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type(value["mail"])
+		if err != nil {
+			log.Fatalf("could not Type: %v", err)
+		}
+		err = doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type(value["password"])
+		if err != nil {
+			log.Fatalf("could not Type: %v", err)
+		}
+		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check()
+		if err != nil {
+			log.Fatalf("could not Check: %v", err)
+		}
+		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click()
+		if err != nil {
+			log.Fatalf("could not click: %v", err)
+		}
+	}
+
 	//fmt.Println(doudian.PlayWrightMain.Page.InputValue("请输入邮箱"))
 	//fmt.Println(doudian.PlayWrightMain.Page.Click())
 
-	time.Sleep(30 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	//text, err = locate.TextContent()
 
