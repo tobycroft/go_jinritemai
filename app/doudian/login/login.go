@@ -30,13 +30,14 @@ func Doudian_Login() (err error) {
 	//
 	//})
 	fmt.Println(doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click())
-	fmt.Println(doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type("asdasd"))
+	fmt.Println(doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type("asdasd@123.com"))
 	fmt.Println(doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type("asdasd"))
-	fmt.Println(doudian.PlayWrightMain.Page.GetByRole(playwright.AriaRole("button")).GetByText("登录").Click())
+	fmt.Println(doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check())
+	fmt.Println(doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click())
 	//fmt.Println(doudian.PlayWrightMain.Page.InputValue("请输入邮箱"))
 	//fmt.Println(doudian.PlayWrightMain.Page.Click())
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 
 	//text, err = locate.TextContent()
 
