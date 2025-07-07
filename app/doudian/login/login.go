@@ -67,24 +67,5 @@ func Doudian_Login() (err error) {
 	//fmt.Println(doudian.PlayWrightMain.Page.Click())
 
 	time.Sleep(10 * time.Second)
-
-	//text, err = locate.TextContent()
-
-	//err = locate.Click()
-	if err != nil {
-		log.Fatalf("could not click: %v", err)
-	}
-	//entries, err := doudian.PlayWrightMain.Page.GetByText("邮箱登录")
-	//if err != nil {
-	//	log.Fatalf("could not get entries: %v", err)
-	//}
-	//for i, entry := range entries {
-	//	title, err := entry.Locator("tbody").TextContent()
-	//	if err != nil {
-	//		log.Fatalf("could not get text content: %v", err)
-	//	}
-	//	fmt.Printf("%d: %s\n", i+1, title)
-	//}
-
 	return nil
 }
