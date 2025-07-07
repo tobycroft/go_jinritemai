@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	login.Doudian_Login()
+	login.DoudianLogin()
 
 	//page, err := doudian.PlayWrightMain.Context.NewPage()
 	//if err != nil {
