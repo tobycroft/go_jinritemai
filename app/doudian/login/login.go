@@ -5,6 +5,8 @@ import (
 	"github.com/Unknwon/goconfig"
 	"github.com/bytedance/sonic"
 	"github.com/playwright-community/playwright-go"
+	"github.com/tobycroft/Calc"
+	Net "github.com/tobycroft/TuuzNet"
 	"log"
 	"main.go/app/doudian"
 	"time"
@@ -48,6 +50,19 @@ func DoudianLogin() (err error) {
 			goconfig.SaveConfigFile(cfg, "conf.ini")
 			fmt.Println("jinritemai_ready")
 		}
+		value2, errs := cfg.GetSection("online_jinritemai")
+		if errs != nil {
+			cfg.SetValue("online_jinritemai", "appkey", "youxiang")
+			cfg.SetValue("online_jinritemai", "appsecert", "mima")
+			goconfig.SaveConfigFile(cfg, "conf.ini")
+			fmt.Println("jinritemai_online_ready")
+		}
+		salt := Calc.Any2String(Calc.Rand(1000, 9999))
+		new(Net.Net).New().SetPostData(map[string]string{
+			"appkey": value2["appkey"],
+			"hash":   Calc.Md5(value2["appkey"] + value2["appsecert"] + salt + Calc.Any2String(time.Now().Unix())),
+			"salt":   salt,
+		})
 
 		if value["cookie"] == "" || value["cookie_DO_NOT_CHANGE"] == "cookie_DO_NOT_CHANGE" {
 
