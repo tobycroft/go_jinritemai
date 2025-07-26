@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 	"main.go/app/doudian"
-	"main.go/app/doudian/login"
+	"main.go/app/doudian/Login"
+	"main.go/app/doudian/User"
 	"main.go/config/app_conf"
 	"os"
 	"time"
@@ -38,36 +39,31 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	login.DoudianLogin()
+	Login.DoudianLogin()
+	User.GetUserInfo()
 
-	//page, err := doudian.PlayWrightMain.Context.NewPage()
-	//if err != nil {
-	//	log.Fatalf("could not create page: %v", err)
-	//}
-	//if rpp, err := page.Goto("https://fxg.jinritemai.com/ffa/morder/order/list"); err != nil {
-	//	log.Fatalf("could not goto: %v", err)
-	//} else {
-	//	log.Println(rpp.Text())
-	//}
-	//fmt.Println(doudian.PlayWrightMain.Context.Cookies())
-	//
-	//fmt.Println("end")
-	//time.Sleep(1 * time.Minute)
-	//entries, err := page.Locator("table").All()
-	//if err != nil {
-	//	log.Fatalf("could not get entries: %v", err)
-	//}
-	//for i, entry := range entries {
-	//	title, err := entry.Locator("tbody").TextContent()
-	//	if err != nil {
-	//		log.Fatalf("could not get text content: %v", err)
-	//	}
-	//	fmt.Printf("%d: %s\n", i+1, title)
-	//}
-	////if err = browser.Close(); err != nil {
-	////	log.Fatalf("could not close browser: %v", err)
-	////}
-	//if err = doudian.PlayWrightMain.PlayWright.Stop(); err != nil {
-	//	log.Fatalf("could not stop Playwright: %v", err)
-	//}
+}
+
+type T struct {
+	CheckSpamResp struct {
+		Decision        string `json:"decision"`
+		VerifyType      string `json:"verify_type"`
+		CheckSpamDetail struct {
+		} `json:"check_spam_detail"`
+		SpamScene string `json:"spam_scene"`
+	} `json:"check_spam_resp"`
+	Code int `json:"code"`
+	Data []struct {
+		Id         string `json:"id"`
+		ScreenName string `json:"screen_name"`
+		AvatarUrl  string `json:"avatar_url"`
+		DisPatch   bool   `json:"dis_patch"`
+	} `json:"data"`
+	Msg                    string `json:"msg"`
+	Page                   int    `json:"page"`
+	RequestArrivedTime     int64  `json:"request_arrived_time"`
+	ServerExecutionEndTime int64  `json:"server_execution_end_time"`
+	Size                   int    `json:"size"`
+	St                     int    `json:"st"`
+	Total                  int    `json:"total"`
 }

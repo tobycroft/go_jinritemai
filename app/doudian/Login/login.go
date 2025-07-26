@@ -1,4 +1,4 @@
-package login
+package Login
 
 import (
 	"fmt"
@@ -24,11 +24,6 @@ import (
 //}
 
 func DoudianLogin() (err error) {
-	doudian.PlayWrightMain.Page, err = doudian.PlayWrightMain.Context.NewPage()
-	if err != nil {
-		log.Fatalf("could not create page: %v", err)
-		return
-	}
 
 	//doudian.PlayWrightMain.Page.OnDOMContentLoaded(func(page playwright.Page) {
 	//	fmt.Println("aa")
@@ -100,31 +95,51 @@ func DoudianLogin() (err error) {
 			//log.Println(rpp.Text())
 		}
 
-		err = doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click()
+		err = doudian.PlayWrightMain.Page.WaitForURL("https://fxg.jinritemai.com/ffa/mshop/homepage/index")
 		if err != nil {
-			log.Fatalf("could not click: %v", err)
-			return
-		}
-		err = doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type(value["mail"])
-		if err != nil {
-			log.Fatalf("could not Type: %v", err)
-			return
-		}
-		err = doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type(value["password"])
-		if err != nil {
-			log.Fatalf("could not Type: %v", err)
-			return
-		}
-		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check()
-		if err != nil {
-			log.Fatalf("could not Check: %v", err)
-			return
-		}
-		time.Sleep(2 * time.Second)
-		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click()
-		if err != nil {
-			log.Fatalf("could not click: %v", err)
-			return
+			err = doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click()
+			if err != nil {
+				fmt.Println(doudian.PlayWrightMain.Page.URL())
+
+				log.Fatalf("could not click1: %v", err)
+				return
+			}
+			err = doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type(value["mail"])
+			if err != nil {
+				log.Fatalf("could not Type: %v", err)
+				return
+			}
+			err = doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type(value["password"])
+			if err != nil {
+				log.Fatalf("could not Type: %v", err)
+				return
+			}
+			err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check()
+			if err != nil {
+				log.Fatalf("could not Check: %v", err)
+				return
+			}
+			time.Sleep(2 * time.Second)
+			err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click()
+			if err != nil {
+				log.Fatalf("could not click2: %v", err)
+				return
+			}
+
+			time.Sleep(5 * time.Second)
+
+			cookie, errs := doudian.PlayWrightMain.Context.Cookies()
+			if errs != nil {
+				log.Fatalf("unable to get cookies: %v", errs)
+			}
+			ck_save, errs := sonic.MarshalString(cookie)
+			if errs != nil {
+				log.Fatalf("unable to save cookie: %v", errs)
+			}
+			cfg.SetValue("jinritemai", "cookie", ck_save)
+			goconfig.SaveConfigFile(cfg, "conf.ini")
+		} else {
+
 		}
 
 		//fmt.Println(doudian.PlayWrightMain.Page.InputValue("请输入邮箱"))
@@ -132,16 +147,5 @@ func DoudianLogin() (err error) {
 
 	}
 
-	time.Sleep(5 * time.Second)
-	cookie, errs := doudian.PlayWrightMain.Context.Cookies()
-	if errs != nil {
-		log.Fatalf("unable to get cookies: %v", errs)
-	}
-	ck_save, errs := sonic.MarshalString(cookie)
-	if errs != nil {
-		log.Fatalf("unable to save cookie: %v", errs)
-	}
-	cfg.SetValue("jinritemai", "cookie", ck_save)
-	goconfig.SaveConfigFile(cfg, "conf.ini")
 	return
 }

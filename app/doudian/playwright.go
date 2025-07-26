@@ -37,5 +37,10 @@ func Start() error {
 		log.Fatalf("could not launch browser: %v", err)
 		return err
 	}
+	PlayWrightMain.Page, err = PlayWrightMain.Context.NewPage()
+	if err != nil {
+		log.Fatalf("could not create page: %v", err)
+		return err
+	}
 	return nil
 }
