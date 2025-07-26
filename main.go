@@ -46,27 +46,3 @@ func main() {
 	fmt.Println(users)
 
 }
-
-type T struct {
-	CheckSpamResp struct {
-		Decision        string `json:"decision"`
-		VerifyType      string `json:"verify_type"`
-		CheckSpamDetail struct {
-		} `json:"check_spam_detail"`
-		SpamScene string `json:"spam_scene"`
-	} `json:"check_spam_resp"`
-	Code int `json:"code"`
-	Data []struct {
-		Id         string `json:"id"`
-		ScreenName string `json:"screen_name"`
-		AvatarUrl  string `json:"avatar_url"`
-		DisPatch   bool   `json:"dis_patch"`
-	} `json:"data"`
-	Msg                    string `json:"msg"`
-	Page                   int    `json:"page"`
-	RequestArrivedTime     int64  `json:"request_arrived_time"`
-	ServerExecutionEndTime int64  `json:"server_execution_end_time"`
-	Size                   int    `json:"size"`
-	St                     int    `json:"st"`
-	Total                  int    `json:"total"`
-}
