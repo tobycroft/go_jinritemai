@@ -65,6 +65,7 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 		}
 		users = us.Data
 		for _, user := range users {
+			fmt.Println(user)
 			sign, salt := doudian.DoudianSecret()
 			ret := new(Net.Net).New().SetPostData(map[string]string{
 				"appid":       doudian.PlayWrightMain.Appid,
@@ -84,5 +85,5 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 		}
 
 	}
-	return err, nil
+	return err, users
 }
