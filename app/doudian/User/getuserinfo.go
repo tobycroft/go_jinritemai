@@ -3,6 +3,7 @@ package User
 import (
 	"fmt"
 	"github.com/bytedance/sonic"
+	Net "github.com/tobycroft/TuuzNet"
 	"log"
 	"main.go/app/doudian"
 	"main.go/tuuz"
@@ -33,18 +34,19 @@ type UsersStruct struct {
 	DisPatch   bool   `json:"dis_patch"`
 }
 
-const getUserInfo = `https://pigeon.jinritemai.com/backstage/getuserinfo?uids=2519720661353812`
+const userPath = `/v2/doudian/user`
 
-func GetUserInfo() (err error, users []UsersStruct) {
+const getUserInfo = `https://pigeon.jinritemai.com/backstage/getuserinfo?uids=`
+
+func GetUserInfo(uids string) (err error, users []UsersStruct) {
 	// 获取用户信息
 	// 这里可以使用 Playwright 的 API 来获取用户信息
 	// 例如，获取页面内容并解析用户信息
-	resp, err := doudian.PlayWrightMain.Page.Goto(getUserInfo)
+	resp, err := doudian.PlayWrightMain.Page.Goto(getUserInfo + uids)
 	if err != nil {
 		log.Fatalf("could not goto: %v", err)
 		return err, nil
 	} else {
-		fmt.Println(resp.Text())
 		body, err := resp.Body()
 		if err != nil {
 			log.Fatalf("could not get body: %v", err, tuuz.FUNCTION_ALL())
@@ -62,6 +64,25 @@ func GetUserInfo() (err error, users []UsersStruct) {
 			return fmt.Errorf("error code: %d, message: %s", us.Code, us.Msg), nil
 		}
 		users = us.Data
+		for _, user := range users {
+			sign, salt := doudian.DoudianSecret()
+			ret := new(Net.Net).New().SetPostData(map[string]string{
+				"appid":       doudian.PlayWrightMain.Appid,
+				"sign":        sign,
+				"salt":        salt,
+				"uid":         user.Id,
+				"screen_name": user.ScreenName,
+				"avatar_url":  user.AvatarUrl,
+			}).SetUrl(doudian.ApiUrl + userPath + "/auto").PostFormData()
+			rtt := doudian.RetStruct[any]{}
+			ret.RetJson(&rtt)
+			if rtt.Code != 0 {
+				log.Fatalf("could not get cookie: %v", rtt.Echo)
+			} else {
+				log.Println(rtt.Echo)
+			}
+		}
+
 	}
 	return err, nil
 }

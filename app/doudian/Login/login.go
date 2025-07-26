@@ -56,7 +56,6 @@ func DoudianCookieInject() (err error) {
 		})
 	}
 	doudian.PlayWrightMain.Context.AddCookies(opck)
-
 	return
 }
 

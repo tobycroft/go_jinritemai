@@ -42,7 +42,7 @@ func main() {
 	}
 	Login.DoudianCookieInject()
 	//Login.DoudianLogin()
-	err, users := User.GetUserInfo()
+	err, users := User.GetUserInfo("2519720661353812")
 	fmt.Println(users)
 
 }
