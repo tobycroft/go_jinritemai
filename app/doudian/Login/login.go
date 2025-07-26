@@ -23,6 +23,66 @@ import (
 //	SameSite playwright.SameSiteAttribute `json:"sameSite"`
 //}
 
+func DoudianCookieInject() (err error) {
+	cfg, errs := goconfig.LoadConfigFile("conf.ini")
+	if errs != nil {
+		goconfig.SaveConfigFile(&goconfig.ConfigFile{}, "conf.ini")
+	} else {
+		value, errs := cfg.GetSection("jinritemai")
+		if errs != nil {
+			cfg.SetValue("jinritemai", "mail", "youxiang")
+			cfg.SetValue("jinritemai", "password", "mima")
+			cfg.SetValue("jinritemai", "cookie", "cookie_DO_NOT_CHANGE")
+			goconfig.SaveConfigFile(cfg, "conf.ini")
+			fmt.Println("jinritemai_ready")
+			return errs
+		}
+		value2, errs := cfg.GetSection("online_jinritemai")
+		if errs != nil {
+			cfg.SetValue("online_jinritemai", "appkey", "youxiang")
+			cfg.SetValue("online_jinritemai", "appsecert", "mima")
+			goconfig.SaveConfigFile(cfg, "conf.ini")
+			fmt.Println("jinritemai_online_ready")
+			return errs
+		}
+		salt := Calc.Any2String(Calc.Rand(1000, 9999))
+		new(Net.Net).New().SetPostData(map[string]string{
+			"appkey": value2["appkey"],
+			"hash":   Calc.Md5(value2["appkey"] + value2["appsecert"] + salt + Calc.Any2String(time.Now().Unix())),
+			"salt":   salt,
+		})
+
+		if value["cookie"] == "" || value["cookie_DO_NOT_CHANGE"] == "cookie_DO_NOT_CHANGE" {
+
+		} else {
+			//fmt.Println(value["cookie"])
+			opck := []playwright.OptionalCookie{}
+			//ck := []_cookie{}
+			err = sonic.UnmarshalString(value["cookie"], &opck)
+			if err != nil {
+				log.Fatalf("could not unmarshal cookie: %v", err)
+				return
+			} else {
+				//opck := []playwright.OptionalCookie{}
+				//for _, cookie := range ck {
+				//	opck = append(opck, playwright.OptionalCookie{
+				//		Name:     cookie.Name,
+				//		Value:    cookie.Value,
+				//		Domain:   &cookie.Domain,
+				//		Path:     &cookie.Path,
+				//		Expires:  &cookie.Expires,
+				//		HttpOnly: &cookie.HttpOnly,
+				//		Secure:   &cookie.Secure,
+				//		SameSite: &cookie.SameSite,
+				//	})
+				//}
+				doudian.PlayWrightMain.Context.AddCookies(opck)
+			}
+		}
+	}
+	return
+}
+
 func DoudianLogin() (err error) {
 
 	//doudian.PlayWrightMain.Page.OnDOMContentLoaded(func(page playwright.Page) {
@@ -62,28 +122,7 @@ func DoudianLogin() (err error) {
 		if value["cookie"] == "" || value["cookie_DO_NOT_CHANGE"] == "cookie_DO_NOT_CHANGE" {
 
 		} else {
-			//fmt.Println(value["cookie"])
-			opck := []playwright.OptionalCookie{}
-			//ck := []_cookie{}
-			err = sonic.UnmarshalString(value["cookie"], &opck)
-			if err != nil {
-				log.Fatalf("could not unmarshal cookie: %v", err)
-			} else {
-				//opck := []playwright.OptionalCookie{}
-				//for _, cookie := range ck {
-				//	opck = append(opck, playwright.OptionalCookie{
-				//		Name:     cookie.Name,
-				//		Value:    cookie.Value,
-				//		Domain:   &cookie.Domain,
-				//		Path:     &cookie.Path,
-				//		Expires:  &cookie.Expires,
-				//		HttpOnly: &cookie.HttpOnly,
-				//		Secure:   &cookie.Secure,
-				//		SameSite: &cookie.SameSite,
-				//	})
-				//}
-				doudian.PlayWrightMain.Context.AddCookies(opck)
-			}
+
 		}
 
 		_, err = doudian.PlayWrightMain.Page.Goto("https://fxg.jinritemai.com/login/common")

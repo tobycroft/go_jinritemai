@@ -1,6 +1,7 @@
 package User
 
 import (
+	"fmt"
 	"github.com/bytedance/sonic"
 	"log"
 	"main.go/app/doudian"
@@ -41,19 +42,26 @@ func GetUserInfo() (err error, users []UsersStruct) {
 	resp, err := doudian.PlayWrightMain.Page.Goto(getUserInfo)
 	if err != nil {
 		log.Fatalf("could not goto: %v", err)
-		return
+		return err, nil
 	} else {
+		fmt.Println(resp.Text())
 		body, err := resp.Body()
 		if err != nil {
-			log.Fatalf("body is fail", err, tuuz.FUNCTION_ALL())
+			log.Fatalf("could not get body: %v", err, tuuz.FUNCTION_ALL())
+			return err, nil
+
 		}
 		var us userInfoStruct
 		err = sonic.Unmarshal(body, &us)
 		if err != nil {
 			log.Fatalf("could not unmarshal: %v", err, tuuz.FUNCTION_ALL())
+			return err, nil
+
+		}
+		if us.Code != 0 {
+			return fmt.Errorf("error code: %d, message: %s", us.Code, us.Msg), nil
 		}
 		users = us.Data
-		return
 	}
-
+	return err, nil
 }
