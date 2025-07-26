@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"main.go/app/doudian"
 	"main.go/app/doudian/Login"
@@ -42,7 +41,6 @@ func main() {
 	}
 	Login.DoudianCookieInject()
 	//Login.DoudianLogin()
-	err, users := User.GetUserInfo("2519720661353812")
-	fmt.Println(users)
+	User.GetUserInfo("2519720661353812")
 
 }
