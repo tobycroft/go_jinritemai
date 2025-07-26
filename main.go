@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"main.go/app/doudian"
+	"main.go/app/doudian/Login"
 	"main.go/app/doudian/User"
 	"main.go/config/app_conf"
 	"os"
@@ -39,7 +40,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//Login.DoudianCookieInject()
+	Login.DoudianCookieInject()
 	//Login.DoudianLogin()
 	err, users := User.GetUserInfo()
 	fmt.Println(users)
