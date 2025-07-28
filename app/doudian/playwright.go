@@ -17,8 +17,12 @@ var PlayWrightMain struct {
 	UserDir    string
 }
 
-func Start() error {
-	var err error
+func Start() (err error) {
+	err = playwright_install()
+	if err != nil {
+		log.Fatalf("could not install playwright: %v", err)
+		return err
+	}
 	PlayWrightMain.PlayWright, err = playwright.Run()
 	if err != nil {
 		log.Fatalf("could not start playwright: %v", err)
@@ -65,5 +69,13 @@ func doudian_ready() (err error) {
 		PlayWrightMain.Appid = value["appid"]
 		PlayWrightMain.AppSecert = value["appsecert"]
 	}
+	return
+}
+
+func playwright_install() (err error) {
+	runOption := &playwright.RunOptions{
+		SkipInstallBrowsers: true,
+	}
+	err = playwright.Install(runOption)
 	return
 }
