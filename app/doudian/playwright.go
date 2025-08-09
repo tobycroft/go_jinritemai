@@ -2,10 +2,11 @@ package doudian
 
 import (
 	"fmt"
-	"github.com/Unknwon/goconfig"
-	"github.com/playwright-community/playwright-go"
 	"log"
 	"os"
+
+	"github.com/Unknwon/goconfig"
+	"github.com/playwright-community/playwright-go"
 )
 
 var PlayWrightMain struct {
@@ -17,7 +18,11 @@ var PlayWrightMain struct {
 	UserDir    string
 }
 
-func Start() (err error) {
+func StartNormal() (err error) {
+	err = doudian_ready()
+	if err != nil {
+		log.Fatalf("could not ready doudian: %v", err)
+	}
 	err = playwright_install()
 	if err != nil {
 		log.Fatalf("could not install playwright: %v", err)
@@ -50,19 +55,55 @@ func Start() (err error) {
 		log.Fatalf("could not create page: %v", err)
 		return err
 	}
-	doudian_ready()
+	return nil
+}
+
+func StartHeadLess() (err error) {
+	err = doudian_ready()
+	if err != nil {
+		log.Fatalf("could not ready doudian: %v", err)
+	}
+	err = playwright_install()
+	if err != nil {
+		log.Fatalf("could not install playwright: %v", err)
+		return err
+	}
+	PlayWrightMain.PlayWright, err = playwright.Run()
+	if err != nil {
+		log.Fatalf("could not start playwright: %v", err)
+		return err
+	}
+	if PlayWrightMain.UserDir == "" {
+		if dir, err := os.UserCacheDir(); err != nil {
+			PlayWrightMain.UserDir = dir + `\Microsoft\Edge\User Data\Default`
+		}
+	}
+	PlayWrightMain.Context, err = PlayWrightMain.PlayWright.Chromium.LaunchPersistentContext(PlayWrightMain.UserDir, playwright.BrowserTypeLaunchPersistentContextOptions{
+		Channel:  playwright.String("msedge"),
+		Headless: playwright.Bool(false),
+	})
+	if err != nil {
+		log.Fatalf("could not launch browser: %v", err)
+		return err
+	}
+	PlayWrightMain.Page, err = PlayWrightMain.Context.NewPage()
+	if err != nil {
+		log.Fatalf("could not create page: %v", err)
+		return err
+	}
+
 	return nil
 }
 func doudian_ready() (err error) {
 	cfg, errs := goconfig.LoadConfigFile("conf.ini")
 	if errs != nil {
-		goconfig.SaveConfigFile(&goconfig.ConfigFile{}, "conf.ini")
+		err = goconfig.SaveConfigFile(&goconfig.ConfigFile{}, "conf.ini")
 	} else {
 		value, errs := cfg.GetSection("online_jinritemai")
 		if errs != nil {
 			cfg.SetValue("online_jinritemai", "appid", "app_id")
 			cfg.SetValue("online_jinritemai", "appsecert", "secret")
-			goconfig.SaveConfigFile(cfg, "conf.ini")
+			err = goconfig.SaveConfigFile(cfg, "conf.ini")
 			fmt.Println("jinritemai_online_ready")
 			return errs
 		}

@@ -2,9 +2,10 @@ package User
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/bytedance/sonic"
 	Net "github.com/tobycroft/TuuzNet"
-	"log"
 	"main.go/app/doudian"
 	"main.go/tuuz"
 )
