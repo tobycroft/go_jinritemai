@@ -14,10 +14,19 @@ var PlayWrightMain struct {
 	AppSecert       string
 	PlayWright      *playwright.Playwright
 	Context         playwright.BrowserContext
-	HeadLessContext playwright.BrowserContext
-	Page            playwright.Page
-	StorageState    *playwright.StorageState
+	ContextHeadLess playwright.BrowserContext
 	UserDir         string
+	Missions        chan string
+}
+
+func init() {
+	PlayWrightMain.Missions = make(chan string)
+}
+
+func MissionThread() {
+	for mission := range PlayWrightMain.Missions {
+		fmt.Println(mission)
+	}
 }
 
 func run() (err error) {
@@ -63,9 +72,37 @@ func StartNormal() (err error) {
 		log.Fatalf("could not launch browser: %v", err)
 		return err
 	}
-	PlayWrightMain.Page, err = PlayWrightMain.Context.NewPage()
+	return nil
+}
+func StartHeadless() (err error) {
+	err = doudian_ready()
 	if err != nil {
-		log.Fatalf("could not create page: %v", err)
+		log.Fatalf("could not ready doudian: %v", err)
+	}
+	err = playwright_install()
+	if err != nil {
+		log.Fatalf("could not install playwright: %v", err)
+		return err
+	}
+	err = run()
+	if err != nil {
+		log.Fatalf("could not run playwright: %v", err)
+	}
+	//browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+	//	Channel:  playwright.String("msedge"),
+	//	Headless: playwright.Bool(false),
+	//})
+	if PlayWrightMain.UserDir == "" {
+		if dir, err := os.UserCacheDir(); err != nil {
+			PlayWrightMain.UserDir = dir + `\Microsoft\Edge\User Data\Default`
+		}
+	}
+	PlayWrightMain.Context, err = PlayWrightMain.PlayWright.Chromium.LaunchPersistentContext(PlayWrightMain.UserDir, playwright.BrowserTypeLaunchPersistentContextOptions{
+		Channel:  playwright.String("msedge"),
+		Headless: playwright.Bool(true),
+	})
+	if err != nil {
+		log.Fatalf("could not launch browser: %v", err)
 		return err
 	}
 	return nil

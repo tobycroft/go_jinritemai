@@ -3,6 +3,7 @@ package Login
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/Unknwon/goconfig"
@@ -105,80 +106,92 @@ func DoudianLogin() (err error) {
 			goconfig.SaveConfigFile(cfg, "conf.ini")
 			fmt.Println("jinritemai_online_ready")
 		}
-		_, err = doudian.PlayWrightMain.Page.Goto("https://fxg.jinritemai.com/login/common")
+		page, errs := doudian.PlayWrightMain.Context.NewPage()
+		if errs != nil {
+			log.Fatalf("could not create new page: %v", errs)
+			return errs
+		}
+
+		_, err = page.Goto("https://fxg.jinritemai.com/login/common")
 		if err != nil {
 			log.Fatalf("could not goto: %v", err)
-			return
+			return err
 		} else {
 			//fmt.Println(resp.StatusText())
 			//log.Println(rpp.Text())
 		}
+		page.On("framenavigated", func(frame playwright.Frame) {
+			url := frame.URL()
+			if strings.Contains(url, "/homepage/index") {
+				err = page.Close()
+				return
+			} else {
+				err = page.GetByText("邮箱登录").Click()
+				if err != nil {
+					fmt.Println(page.URL())
 
-		err = doudian.PlayWrightMain.Page.GetByText("邮箱登录").Click()
-		if err != nil {
-			fmt.Println(doudian.PlayWrightMain.Page.URL())
+					log.Fatalf("could not click1: %v", err)
+					return
+				}
+				err = page.GetByPlaceholder("请输入邮箱").Type(value["mail"])
+				if err != nil {
+					log.Fatalf("could not Type: %v", err)
+					return
+				}
+				err = page.GetByPlaceholder("密码").Type(value["password"])
+				if err != nil {
+					log.Fatalf("could not Type: %v", err)
+					return
+				}
+				err = page.GetByRole(*playwright.AriaRoleCheckbox).Check()
+				if err != nil {
+					log.Fatalf("could not Check: %v", err)
+					return
+				}
+				time.Sleep(1 * time.Second)
+				err = page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click()
+				if err != nil {
+					log.Fatalf("could not click2: %v", err)
+					return
+				}
 
-			log.Fatalf("could not click1: %v", err)
-			return
-		}
-		err = doudian.PlayWrightMain.Page.GetByPlaceholder("请输入邮箱").Type(value["mail"])
-		if err != nil {
-			log.Fatalf("could not Type: %v", err)
-			return
-		}
-		err = doudian.PlayWrightMain.Page.GetByPlaceholder("密码").Type(value["password"])
-		if err != nil {
-			log.Fatalf("could not Type: %v", err)
-			return
-		}
-		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleCheckbox).Check()
-		if err != nil {
-			log.Fatalf("could not Check: %v", err)
-			return
-		}
-		time.Sleep(1 * time.Second)
-		err = doudian.PlayWrightMain.Page.GetByRole(*playwright.AriaRoleButton).GetByText("登录").Click()
-		if err != nil {
-			log.Fatalf("could not click2: %v", err)
-			return
-		}
+				time.Sleep(3 * time.Second)
 
-		time.Sleep(5 * time.Second)
+				cookie, errs := doudian.PlayWrightMain.Context.Cookies()
+				if errs != nil {
+					log.Fatalf("unable to get cookies: %v", errs)
+				}
+				ck_save, errs := sonic.MarshalString(cookie)
+				if errs != nil {
+					log.Fatalf("unable to save cookie: %v", errs)
+				}
 
-		cookie, errs := doudian.PlayWrightMain.Context.Cookies()
-		if errs != nil {
-			log.Fatalf("unable to get cookies: %v", errs)
-		}
-		ck_save, errs := sonic.MarshalString(cookie)
-		if errs != nil {
-			log.Fatalf("unable to save cookie: %v", errs)
-		}
+				sign, salt := doudian.DoudianSecret()
+				ret := new(Net.Net).New().SetPostData(map[string]string{
+					"appid": doudian.PlayWrightMain.Appid,
+					"sign":  sign,
+					"salt":  salt,
+					"data":  ck_save,
+				}).SetUrl(doudian.ApiUrl + cookiePath + "/auto").PostFormData()
 
-		sign, salt := doudian.DoudianSecret()
-		ret := new(Net.Net).New().SetPostData(map[string]string{
-			"appid": doudian.PlayWrightMain.Appid,
-			"sign":  sign,
-			"salt":  salt,
-			"data":  ck_save,
-		}).SetUrl(doudian.ApiUrl + cookiePath + "/auto").PostFormData()
+				rtt := doudian.RetStruct[any]{}
+				err = ret.RetJson(&rtt)
+				if err != nil {
+					log.Fatalf("could not parse response: %v", err)
+					return
+				}
+				if rtt.Code != 0 {
+					log.Fatalf("could not get cookie: %v", rtt.Echo)
+					return
+				} else {
+					log.Println(rtt.Echo, ck_save)
+				}
 
-		rtt := doudian.RetStruct[any]{}
-		err = ret.RetJson(&rtt)
-		if err != nil {
-			log.Fatalf("could not parse response: %v", err)
-			return
-		}
-		if rtt.Code != 0 {
-			log.Fatalf("could not get cookie: %v", rtt.Echo)
-			return
-		} else {
-			log.Println(rtt.Echo, ck_save)
-		}
+				//fmt.Println(doudian.PlayWrightMain.Page.InputValue("请输入邮箱"))
+				//fmt.Println(doudian.PlayWrightMain.Page.Click())
+			}
 
-		//fmt.Println(doudian.PlayWrightMain.Page.InputValue("请输入邮箱"))
-		//fmt.Println(doudian.PlayWrightMain.Page.Click())
-
+		})
 	}
-
 	return
 }

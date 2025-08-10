@@ -41,7 +41,7 @@ const userPath = `/v2/doudian/user`
 const getUserInfo = `https://pigeon.jinritemai.com/backstage/getuserinfo?uids=`
 
 func GetUserInfo(uids string) (err error, users []UsersStruct) {
-	err = doudian.StartNormal()
+	err = doudian.StartHeadless()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,7 +52,8 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 	// 获取用户信息
 	// 这里可以使用 Playwright 的 API 来获取用户信息
 	// 例如，获取页面内容并解析用户信息
-	resp, err := doudian.PlayWrightMain.Page.Goto(getUserInfo + uids)
+	page, err := doudian.PlayWrightMain.Context.NewPage()
+	resp, err := page.Goto(getUserInfo + uids)
 	if err != nil {
 		log.Fatalf("could not goto: %v", err)
 		return err, nil
