@@ -16,6 +16,7 @@ var PlayWrightMain struct {
 	Context         playwright.BrowserContext
 	HeadLessContext playwright.BrowserContext
 	Page            playwright.Page
+	StorageState    *playwright.StorageState
 	UserDir         string
 }
 
