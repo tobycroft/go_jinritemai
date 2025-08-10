@@ -35,6 +35,17 @@ func DoudianCookieInject() (err error) {
 	}).SetUrl(doudian.ApiUrl + cookiePath + "/get").PostFormData()
 	rtt := doudian.RetStruct[doudian.CookieStruct]{}
 	ret.RetJson(&rtt)
+	switch rtt.Code {
+	case 404:
+		return
+
+	case 0:
+		break
+
+	default:
+		return fmt.Errorf("cookie error code: %d, message: %s", rtt.Code, rtt.Echo)
+
+	}
 	if rtt.Code != 0 {
 		return
 	} else {
