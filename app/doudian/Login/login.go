@@ -2,13 +2,14 @@ package Login
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/Unknwon/goconfig"
 	"github.com/bytedance/sonic"
 	"github.com/playwright-community/playwright-go"
 	Net "github.com/tobycroft/TuuzNet"
-	"log"
 	"main.go/app/doudian"
-	"time"
 )
 
 //type _cookie struct {
@@ -35,7 +36,6 @@ func DoudianCookieInject() (err error) {
 	rtt := doudian.RetStruct[doudian.CookieStruct]{}
 	ret.RetJson(&rtt)
 	if rtt.Code != 0 {
-		log.Fatalf("could not get cookie: %v", rtt.Echo)
 		return
 	} else {
 		//log.Println(rtt.Echo, rtt.Data)
@@ -60,7 +60,14 @@ func DoudianCookieInject() (err error) {
 }
 
 func DoudianLogin() (err error) {
-
+	err = doudian.StartNormal()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = DoudianCookieInject()
+	if err != nil {
+		log.Fatalf("could not inject cookie: %v", err)
+	}
 	//doudian.PlayWrightMain.Page.OnDOMContentLoaded(func(page playwright.Page) {
 	//	fmt.Println("aa")
 	//	//locate := doudian.PlayWrightMain.Page.GetByText("加载中")
@@ -145,7 +152,11 @@ func DoudianLogin() (err error) {
 		}).SetUrl(doudian.ApiUrl + cookiePath + "/auto").PostFormData()
 
 		rtt := doudian.RetStruct[any]{}
-		ret.RetJson(&rtt)
+		err = ret.RetJson(&rtt)
+		if err != nil {
+			log.Fatalf("could not parse response: %v", err)
+			return
+		}
 		if rtt.Code != 0 {
 			log.Fatalf("could not get cookie: %v", rtt.Echo)
 			return

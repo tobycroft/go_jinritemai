@@ -1,12 +1,10 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"time"
 
-	"main.go/app/doudian"
-	"main.go/app/doudian/Login"
 	"main.go/app/doudian/User"
 	"main.go/config/app_conf"
 )
@@ -36,12 +34,9 @@ func main() {
 	//route.OnRoute(mainroute)
 	//mainroute.Run(":80")
 	//err := playwright.Install()
-	err := doudian.StartNormal()
-	if err != nil {
-		log.Fatal(err)
-	}
-	Login.DoudianCookieInject()
-	Login.DoudianLogin()
-	User.GetUserInfo("2519720661353812")
+
+	//Login.DoudianCookieInject()
+	//Login.DoudianLogin()
+	fmt.Println(User.GetUserInfo("2519720661353812"))
 
 }

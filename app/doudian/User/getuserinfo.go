@@ -7,6 +7,7 @@ import (
 	"github.com/bytedance/sonic"
 	Net "github.com/tobycroft/TuuzNet"
 	"main.go/app/doudian"
+	"main.go/app/doudian/Login"
 	"main.go/tuuz"
 )
 
@@ -40,6 +41,14 @@ const userPath = `/v2/doudian/user`
 const getUserInfo = `https://pigeon.jinritemai.com/backstage/getuserinfo?uids=`
 
 func GetUserInfo(uids string) (err error, users []UsersStruct) {
+	err = doudian.StartNormal()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = Login.DoudianCookieInject()
+	if err != nil {
+		log.Fatalf("could not inject cookie: %v", err)
+	}
 	// 获取用户信息
 	// 这里可以使用 Playwright 的 API 来获取用户信息
 	// 例如，获取页面内容并解析用户信息
@@ -61,7 +70,13 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 			return err, nil
 
 		}
-		if us.Code != 0 {
+		if us.Code == 10005 {
+			err = Login.DoudianLogin()
+			if err != nil {
+				log.Fatalf("could not login: %v", err)
+				return err, nil
+			}
+		} else if us.Code != 0 {
 			return fmt.Errorf("error code: %d, message: %s", us.Code, us.Msg), nil
 		}
 		users = us.Data
