@@ -65,10 +65,7 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 			return err, nil
 
 		}
-		err = page.Close()
-		if err != nil {
-			log.Fatalf("could not close: %v", err)
-		}
+
 		var us userInfoStruct
 		err = sonic.Unmarshal(body, &us)
 		if err != nil {
@@ -105,6 +102,10 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 			}
 		}
 
+	}
+	err = page.Close()
+	if err != nil {
+		log.Fatalf("could not close: %v", err)
 	}
 	return
 }
