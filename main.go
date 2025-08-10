@@ -46,7 +46,7 @@ func main() {
 		log.Fatalf("could not inject cookie: %v", err)
 	}
 	//Login.DoudianCookieInject()
-	Login.DoudianLogin()
+	//Login.DoudianLogin()
 	fmt.Println(User.GetUserInfo("2519720661353812"))
 	//time.Sleep(5 * time.Second)
 
