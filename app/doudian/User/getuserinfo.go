@@ -41,10 +41,10 @@ const userPath = `/v2/doudian/user`
 const getUserInfo = `https://pigeon.jinritemai.com/backstage/getuserinfo?uids=`
 
 func GetUserInfo(uids string) (err error, users []UsersStruct) {
-	err = doudian.StartHeadless()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err = doudian.StartNormal()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	err = Login.DoudianCookieInject()
 	if err != nil {
 		log.Fatalf("could not inject cookie: %v", err)
@@ -53,6 +53,10 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 	// 这里可以使用 Playwright 的 API 来获取用户信息
 	// 例如，获取页面内容并解析用户信息
 	page, err := doudian.PlayWrightMain.Context.NewPage()
+	if err != nil {
+		log.Fatalf("could not create new page: %v", err)
+		return err, nil
+	}
 	resp, err := page.Goto(getUserInfo + uids)
 	if err != nil {
 		log.Fatalf("could not goto: %v", err)
@@ -63,6 +67,10 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 			log.Fatalf("could not get body: %v", err, tuuz.FUNCTION_ALL())
 			return err, nil
 
+		}
+		err = page.Close()
+		if err != nil {
+			log.Fatalf("could not close: %v", err)
 		}
 		var us userInfoStruct
 		err = sonic.Unmarshal(body, &us)

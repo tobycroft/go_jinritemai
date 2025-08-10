@@ -72,10 +72,10 @@ func DoudianCookieInject() (err error) {
 }
 
 func DoudianLogin() (err error) {
-	err = doudian.StartNormal()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err = doudian.StartNormal()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	err = DoudianCookieInject()
 	if err != nil {
 		log.Fatalf("could not inject cookie: %v", err)

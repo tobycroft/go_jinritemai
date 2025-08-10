@@ -10,13 +10,12 @@ import (
 )
 
 var PlayWrightMain struct {
-	Appid           string
-	AppSecert       string
-	PlayWright      *playwright.Playwright
-	Context         playwright.BrowserContext
-	ContextHeadLess playwright.BrowserContext
-	UserDir         string
-	Missions        chan string
+	Appid      string
+	AppSecert  string
+	PlayWright *playwright.Playwright
+	Context    playwright.BrowserContext
+	UserDir    string
+	Missions   chan string
 }
 
 func init() {
