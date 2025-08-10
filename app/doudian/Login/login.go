@@ -190,7 +190,6 @@ func DoudianLogin() (err error) {
 				//fmt.Println(doudian.PlayWrightMain.Page.InputValue("请输入邮箱"))
 				//fmt.Println(doudian.PlayWrightMain.Page.Click())
 			}
-
 		})
 	}
 	return
