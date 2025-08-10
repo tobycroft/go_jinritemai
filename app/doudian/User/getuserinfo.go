@@ -45,10 +45,7 @@ func GetUserInfo(uids string) (err error, users []UsersStruct) {
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-	err = Login.DoudianCookieInject()
-	if err != nil {
-		log.Fatalf("could not inject cookie: %v", err)
-	}
+
 	// 获取用户信息
 	// 这里可以使用 Playwright 的 API 来获取用户信息
 	// 例如，获取页面内容并解析用户信息

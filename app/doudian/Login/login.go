@@ -76,10 +76,10 @@ func DoudianLogin() (err error) {
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-	err = DoudianCookieInject()
-	if err != nil {
-		log.Fatalf("could not inject cookie: %v", err)
-	}
+	//err = DoudianCookieInject()
+	//if err != nil {
+	//	log.Fatalf("could not inject cookie: %v", err)
+	//}
 	//doudian.PlayWrightMain.Page.OnDOMContentLoaded(func(page playwright.Page) {
 	//	fmt.Println("aa")
 	//	//locate := doudian.PlayWrightMain.Page.GetByText("加载中")

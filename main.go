@@ -41,6 +41,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = Login.DoudianCookieInject()
+	if err != nil {
+		log.Fatalf("could not inject cookie: %v", err)
+	}
 	//Login.DoudianCookieInject()
 	Login.DoudianLogin()
 	fmt.Println(User.GetUserInfo("2519720661353812"))
